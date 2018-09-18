@@ -34,6 +34,7 @@ import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherAppState;
+import com.android.launcher3.PendingAddItemInfo;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.compat.AlphabeticIndexCompat;
@@ -58,7 +59,8 @@ public class WidgetsContainerView extends BaseContainerView
     private static final boolean LOGD = false;
 
     /* Global instances that are used inside this container. */
-    @Thunk Launcher mLauncher;
+    @Thunk
+    Launcher mLauncher;
 
     /* Recycler view related member variables */
     private WidgetsRecyclerView mRecyclerView;
@@ -119,7 +121,7 @@ public class WidgetsContainerView extends BaseContainerView
         if (!mLauncher.isWidgetsViewVisible()
                 || mLauncher.getWorkspace().isSwitchingState()
                 || !(v instanceof WidgetCell)) return;
-
+        PendingAddItemInfo mAddInfo = (PendingAddItemInfo) v.getTag();
         handleClick();
     }
 
@@ -217,7 +219,7 @@ public class WidgetsContainerView extends BaseContainerView
 
     @Override
     public void onDropCompleted(View target, DragObject d, boolean isFlingToDelete,
-            boolean success) {
+                                boolean success) {
         if (LOGD) {
             Log.d(TAG, "onDropCompleted");
         }

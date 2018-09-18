@@ -21,6 +21,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -602,7 +603,9 @@ public class CellLayout extends ViewGroup implements BubbleTextShadowHandler {
     public boolean addViewToCellLayout(View child, int index, int childId, LayoutParams params,
             boolean markCells) {
         final LayoutParams lp = params;
-
+        if (childId == 1234){
+            System.out.println();
+        }
         // Hotseat icons - remove text
         if (child instanceof BubbleTextView) {
             BubbleTextView bubbleChild = (BubbleTextView) child;
@@ -1060,6 +1063,7 @@ public class CellLayout extends ViewGroup implements BubbleTextShadowHandler {
         }
     }
 
+    @SuppressLint("StringFormatMatches")
     public String getItemMoveDescription(int cellX, int cellY) {
         if (mContainerType == HOTSEAT) {
             return getContext().getString(R.string.move_to_hotseat_position,

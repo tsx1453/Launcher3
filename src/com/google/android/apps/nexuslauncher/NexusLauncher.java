@@ -87,7 +87,7 @@ public class NexusLauncher {
         }
 
         public boolean hasCustomContentToLeft() {
-            return false;
+            return true;
         }
 
         public boolean hasSettings() {

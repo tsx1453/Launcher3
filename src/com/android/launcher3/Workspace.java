@@ -53,6 +53,9 @@ import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.android.launcher3.Launcher.CustomContentCallbacks;
@@ -133,7 +136,7 @@ public class Workspace extends PagedView
     // The is the first screen. It is always present, even if its empty.
     public static final long FIRST_SCREEN_ID = 0;
 
-    private final static long CUSTOM_CONTENT_SCREEN_ID = -301;
+    public final static long CUSTOM_CONTENT_SCREEN_ID = -301;
 
     private static final long CUSTOM_CONTENT_GESTURE_DELAY = 200;
     private long mTouchDownTime = -1;
@@ -587,6 +590,7 @@ public class Workspace extends PagedView
      *
      * @param qsb an existing qsb to recycle or null.
      */
+    @SuppressLint("ClickableViewAccessibility")
     public void bindAndInitFirstWorkspaceScreen(View qsb) {
         if (!FeatureFlags.QSB_ON_FIRST_SCREEN) {
             return;
@@ -708,13 +712,25 @@ public class Workspace extends PagedView
     }
 
     public void createCustomContentContainer() {
-        CellLayout customScreen = (CellLayout)
+        final CellLayout customScreen = (CellLayout)
                 LayoutInflater.from(getContext()).inflate(R.layout.workspace_screen, this, false);
         customScreen.disableDragTarget();
         customScreen.disableJailContent();
-        customScreen.setBackgroundColor(getContext().getColor(R.color.container_page_bg));
+//        customScreen.setBackgroundColor(getContext().getColor(R.color.container_page_bg));
         mWorkspaceScreens.put(CUSTOM_CONTENT_SCREEN_ID, customScreen);
         mScreenOrder.add(0, CUSTOM_CONTENT_SCREEN_ID);
+
+//        View view = LayoutInflater.from(getContext()).inflate(R.layout.custom_layout, customScreen, false);
+//        view.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d("mylauncher3", "patop" + v.getPaddingTop());
+//            }
+//        });
+//        CellLayout.LayoutParams layoutParams = new CellLayout.LayoutParams(0, 0, 5, 4);
+//        layoutParams.isFullscreen = true;
+//        customScreen.addViewToCellLayout(view, 0, 1234, layoutParams, true);
+//        customScreen.addView(view);
 
         // We want no padding on the custom content
         customScreen.setPadding(0, 0, 0, 0);
@@ -1196,6 +1212,7 @@ public class Workspace extends PagedView
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         if (mLauncher.isAllAppsVisible()) {
+//            Log.d("mylauncher3","allAppsVisible true");
             return true;
         }
         switch (ev.getAction() & MotionEvent.ACTION_MASK) {
@@ -1203,16 +1220,19 @@ public class Workspace extends PagedView
                 mXDown = ev.getX();
                 mYDown = ev.getY();
                 mTouchDownTime = System.currentTimeMillis();
+//                Log.d("mylauncher3","action_mask_down");
                 break;
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_UP:
                 if (mTouchState == TOUCH_STATE_REST) {
                     final CellLayout currentPage = (CellLayout) getChildAt(mCurrentPage);
                     if (currentPage != null) {
+//                        Log.d("mylauncher3","onWallpaperTap");
                         onWallpaperTap(ev);
                     }
                 }
         }
+//        Log.d("mylauncher3","super");
         return super.onInterceptTouchEvent(ev);
     }
 
@@ -4204,4 +4224,31 @@ public class Workspace extends PagedView
             onEndStateTransition();
         }
     }
+
+    class CustomPageListener implements View.OnTouchListener {
+
+        float startX, startY;
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+//            switch (event.getAction()) {
+//                case MotionEvent.ACTION_DOWN:
+//                    startX = event.getX();
+//                    startY = event.getY();
+//                    return true;
+//                default:
+//                    if (Math.abs(event.getY() - startY) > Math.abs(event.getX() - startX)) {
+//                        v.getParent().requestDisallowInterceptTouchEvent(true);
+//                        return true;
+//                    } else {
+//                        v.getParent().requestDisallowInterceptTouchEvent(false);
+//                        return false;
+//                    }
+//            }
+//            v.getParent().requestDisallowInterceptTouchEvent(true);
+            return false;
+        }
+    }
+
 }
+
