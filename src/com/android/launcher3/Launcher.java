@@ -94,6 +94,9 @@ import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.compat.LauncherAppsCompatVO;
 import com.android.launcher3.compat.UserManagerCompat;
 import com.android.launcher3.config.FeatureFlags;
+import com.android.launcher3.custompage.ScreenUtils;
+import com.android.launcher3.custompage.bean.WeatherBean;
+import com.android.launcher3.custompage.weather.WeatherManager;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragOptions;
@@ -3274,41 +3277,63 @@ public class Launcher extends BaseActivity
         // Create the custom content page (this call updates mDefaultScreen which calls
         // setCurrentPage() so ensure that all pages are added before calling this).
         if (hasCustomContentToLeft()) {
-            mWorkspace.createCustomContentContainer();
-            populateCustomContentContainer();
-            View view = LayoutInflater.from(this).inflate(R.layout.custom_layout, mWorkspace, false);
-            customPageCotainer = view.findViewById(R.id.container);
-            mWorkspace.addToCustomContentPage(
-                    view,
-                    new CustomContentCallbacks() {
-                        @Override
-                        public void onShow(boolean fromResume) {
-
-                        }
-
-                        @Override
-                        public void onHide() {
-
-                        }
-
-                        @Override
-                        public void onScrollProgressChanged(float progress) {
-
-                        }
-
-                        @Override
-                        public boolean isScrollingAllowed() {
-                            return true;
-                        }
-                    },
-                    "a"
-            );
+            initCustomPage();
         }
 
         // After we have added all the screens, if the wallpaper was locked to the default state,
         // then notify to indicate that it can be released and a proper wallpaper offset can be
         // computed before the next layout
         mWorkspace.unlockWallpaperFromDefaultPageOnNextLayout();
+    }
+
+    private void initCustomPage() {
+        mWorkspace.createCustomContentContainer();
+        populateCustomContentContainer();
+        View view = LayoutInflater.from(this).inflate(R.layout.custom_layout, mWorkspace, false);
+        customPageCotainer = view.findViewById(R.id.container);
+        ScreenUtils screenUtils = new ScreenUtils(this.getApplicationContext());
+        view.setPadding(0, screenUtils.getStatusBarHeight(), 0, screenUtils.getNavigationBarHeight());
+        mWorkspace.addToCustomContentPage(
+                view,
+                new CustomContentCallbacks() {
+                    @Override
+                    public void onShow(boolean fromResume) {
+
+                    }
+
+                    @Override
+                    public void onHide() {
+
+                    }
+
+                    @Override
+                    public void onScrollProgressChanged(float progress) {
+
+                    }
+
+                    @Override
+                    public boolean isScrollingAllowed() {
+                        return true;
+                    }
+                },
+                "a"
+        );
+        view.findViewById(R.id.settings_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new WeatherManager().getWeather(new WeatherManager.WeatherGetListener() {
+                    @Override
+                    public void onSuccess(WeatherBean bean) {
+                        Log.d("mylauncher3", bean.getHeWeather6().get(0).getNow().getTmp());
+                    }
+
+                    @Override
+                    public void onFailed(String s) {
+
+                    }
+                });
+            }
+        });
     }
 
     private void bindAddScreens(ArrayList<Long> orderedScreenIds) {
